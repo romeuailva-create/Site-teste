@@ -1,0 +1,291 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Salgados da Vovó 🫔</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- ================================================================
+       CSS — ESTILOS
+  ================================================================ -->
+</head>
+<body>
+
+
+  <!-- ================================================================
+       HTML — ESTRUTURA
+  ================================================================ -->
+  <header>
+    <button class="hamburger" onclick="toggleMenu()" id="hamburgerBtn">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="logo">
+      <span class="logo-icon"></span>
+      <h1>Salgados da vovó <small>Feito com amor, desde 1985</small></h1>
+    </div>
+    <nav class="nav-right">
+      <button class="btn-hlogin" id="btnHLogin" onclick="openLogin('login')">Entrar / Cadastrar</button>
+      <div class="user-info" id="uInfo">
+        <div class="user-avatar" id="uAvatar">?</div>
+        <div>
+          <div class="user-name" id="uName">—</div>
+          <div class="user-role" id="uRole" style="display:none"></div>
+        </div>
+        <button class="btn-logout" onclick="doLogout()">Sair</button>
+      </div>
+      <button class="cart-btn" onclick="openCart()">
+        🛒 Carrinho <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    
+    <h2>Os melhores salgados da cidade!</h2>
+    <p>Fresquinhos, crocantes e cheios de sabor — prontos para você!</p>
+    <div class="hero-chips">
+      <span class="hero-chip">Entrega rápida</span>
+      <span class="hero-chip">Sempre fresquinhos</span>
+      <span class="hero-chip">Receitas da vovó</span>
+      <span class="hero-chip">Pague na entrega</span>
+    </div>
+  </section>
+
+  <!-- ADMIN -->
+  <section id="adminPanel">
+    <div class="admin-inner">
+      <h2 class="admin-title">Painel Administrativo</h2>
+      <div class="astats" id="aStats"></div>
+      <h3 class="orders-title">Últimos Pedidos</h3>
+      <div id="oList"><p class="empty-msg">Nenhum pedido ainda.</p></div>
+    </div>
+  </section>
+
+  <!-- CARDÁPIO -->
+  <section class="section">
+    <h2 class="sec-title">Nosso cardápio</h2>
+    <div class="grid" id="prodGrid"></div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>Feito com amor por <strong>Salgados da vovó</strong> — Todos os direitos reservados © 2025</footer>
+
+  <!-- MENU LATERAL (DRAWER) -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeMenu()"></div>
+  <nav class="drawer" id="drawer">
+    <div class="drawer-header">
+      <span class="drawer-logo"></span>
+      <div>
+        <div class="drawer-title">Salgados da vovó</div>
+        <div class="drawer-sub">Feito com amor</div>
+      </div>
+      <button class="drawer-close" onclick="closeMenu()">✕</button>
+    </div>
+
+    <div class="drawer-user" id="drawerUser" style="display:none">
+      <div class="drawer-avatar" id="drawerAvatar">?</div>
+      <div>
+        <div class="drawer-uname" id="drawerUname">—</div>
+        <div class="drawer-uemail" id="drawerUemail">—</div>
+      </div>
+    </div>
+
+    <ul class="drawer-menu">
+      <li onclick="closeMenu()"><span></span> Início</li>
+      <li onclick="closeMenu(); scrollTo({top:document.getElementById('prodGrid').offsetTop - 80, behavior:'smooth'})"><span></span> cardápio</li>
+      <li onclick="closeMenu(); openCart()"><span></span> Meu Carrinho</li>
+      <li class="drawer-divider"></li>
+      <li id="drawerLoginItem" onclick="closeMenu(); openLogin('login')"><span></span> Entrar / Cadastrar</li>
+      <li id="drawerLogoutItem" style="display:none" onclick="closeMenu(); doLogout()"><span></span> Sair da Conta</li>
+      <li id="drawerAdminItem" style="display:none" onclick="closeMenu(); document.getElementById('adminPanel').scrollIntoView({behavior:'smooth'})"><span></span> Painel Admin</li>
+    </ul>
+
+    <div class="drawer-footer">
+      <p>Rua dos Salgados, 123</p>
+      <p>(11) 99999-9999</p>
+      <p>Seg–Sáb: 8h às 20h</p>
+    </div>
+  </nav>
+
+  <!-- MODAL: LOGIN / CADASTRO / RECUPERAR SENHA -->
+  <div class="overlay" id="loginOverlay" onclick="oClick(event,'loginOverlay')">
+    <div class="login-modal" id="loginModal">
+      <button class="mclose" onclick="closeLogin()">✕</button>
+      <div class="mlogo"><h2>Salgados da vovó</h2></div>
+      <div class="tab-row" id="tabRow">
+        <button class="tab-btn on" onclick="switchTab('login')">Entrar</button>
+        <button class="tab-btn"   onclick="switchTab('register')">Cadastrar</button>
+      </div>
+      <!-- Login -->
+      <div id="tLogin">
+        <div class="fgroup"><label>E-mail</label><input type="email" id="lEmail" placeholder="seuemail@exemplo.com" /></div>
+        <div class="fgroup"><label>Senha</label><input type="password" id="lPass" placeholder="••••••••" /></div>
+        <a class="flink" onclick="switchTab('forgot')">Esqueci minha senha</a>
+        <button class="btn-p" onclick="doLogin()">Entrar agora →</button>
+        <p class="err" id="lErr">E-mail ou senha incorretos!</p>
+        <div class="hint"><strong>Admin</strong> — admin@salgados.com / Admin@123<br/><strong>Demo</strong> — cliente@demo.com / cliente123</div>
+      </div>
+      <!-- Cadastro -->
+      <div id="tRegister" style="display:none">
+        <div class="fgroup"><label>Nome completo</label><input type="text" id="rName" placeholder="Seu nome completo" /></div>
+        <div class="fgroup"><label>E-mail</label><input type="email" id="rEmail" placeholder="seuemail@exemplo.com" /></div>
+        <div class="fgroup"><label>Senha (mín. 6 caracteres)</label><input type="password" id="rPass" placeholder="••••••••" /></div>
+        <button class="btn-p" onclick="doRegister()">Criar minha conta →</button>
+        <p class="err" id="rErr"></p>
+        <button class="btn-g" onclick="switchTab('login')">← Já tenho conta</button>
+      </div>
+      <!-- Recuperar Senha -->
+      <div id="tForgot" style="display:none">
+        <div class="sdots" id="sdots">
+          <div class="dot active" id="d1"></div>
+          <div class="dot" id="d2"></div>
+          <div class="dot" id="d3"></div>
+        </div>
+        <div class="fstep on" id="fs1">
+          <div class="sheader"><h3>Recuperar Senha</h3><p>Informe o e-mail cadastrado.</p></div>
+          <div class="fgroup"><label>E-mail</label><input type="email" id="fEmail" placeholder="seuemail@exemplo.com" /></div>
+          <button class="btn-p" onclick="fStep1()">Enviar Código →</button>
+          <p class="err" id="fErr1">E-mail não encontrado.</p>
+          <button class="btn-g" onclick="switchTab('login')">← Voltar ao login</button>
+        </div>
+        <div class="fstep" id="fs2">
+          <div class="sheader"><h3>Digite o Código</h3><p>Enviado para <span class="hi" id="fEmailShow"></span></p></div>
+          <div class="chint">Código simulado: <strong id="codeShow">——</strong></div>
+          <div class="cboxes">
+            <input class="cbox" maxlength="1" id="cb1" oninput="cIn(this,null,'cb2')"  onkeydown="cBk(event,this,null)" />
+            <input class="cbox" maxlength="1" id="cb2" oninput="cIn(this,'cb1','cb3')" onkeydown="cBk(event,this,'cb1')" />
+            <input class="cbox" maxlength="1" id="cb3" oninput="cIn(this,'cb2','cb4')" onkeydown="cBk(event,this,'cb2')" />
+            <input class="cbox" maxlength="1" id="cb4" oninput="cIn(this,'cb3','cb5')" onkeydown="cBk(event,this,'cb3')" />
+            <input class="cbox" maxlength="1" id="cb5" oninput="cIn(this,'cb4','cb6')" onkeydown="cBk(event,this,'cb4')" />
+            <input class="cbox" maxlength="1" id="cb6" oninput="cIn(this,'cb5',null)"  onkeydown="cBk(event,this,'cb5')" />
+          </div>
+          <p class="err" id="fErr2">Código incorreto!</p>
+          <button class="btn-p" onclick="fStep2()">Verificar →</button>
+          <div class="resend">Não recebeu? <span onclick="resend()">Reenviar Código</span></div>
+          <button class="btn-g" onclick="goFS(1)">← Voltar</button>
+        </div>
+        <div class="fstep" id="fs3">
+          <div class="sheader"><h3>Nova Senha</h3><p>Crie uma senha forte.</p></div>
+          <div class="fgroup">
+            <label>🔒 Nova senha</label>
+            <input type="password" id="np1" placeholder="Mínimo 6 caracteres" oninput="strengthCheck()" />
+            <div class="sbar-wrap"><div class="sbar" id="sBar"></div></div>
+            <div class="slbl" id="sLbl"></div>
+          </div>
+          <div class="fgroup"><label>🔒 Confirmar</label><input type="password" id="np2" placeholder="Repita a senha" /></div>
+          <p class="err" id="fErr3">Senhas não conferem!</p>
+          <button class="btn-p" onclick="fStep3()">Salvar nova senha →</button>
+        </div>
+        <div class="fstep" id="fs4">
+          <div class="sbox"><h3>Senha Alterada!</h3><p>Entre com a nova senha agora.</p><button class="btn-p" onclick="switchTab('login')">Entrar →</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CARRINHO -->
+  <div class="overlay" id="cartOverlay" onclick="oClick(event,'cartOverlay')">
+    <div class="cart-modal">
+      <div class="chead">
+        <h2>💳 Meu Carrinho</h2>
+        <button class="mclose" onclick="closeCart()">✕</button>
+      </div>
+      <div class="cbody" id="cBody"></div>
+      <div class="cfoot" id="cFoot" style="display:none">
+        <div class="ctotal"><span>Total:</span><strong id="cTotal">R$ 0,00</strong></div>
+        <button class="btn-checkout" onclick="checkout()">Finalizar Pedido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PAGAMENTO -->
+  <div class="overlay" id="payOverlay" onclick="oClick(event,'payOverlay')">
+    <div class="pay-modal">
+      <div class="pay-head">
+        <h2>💳 Forma de Pagamento</h2>
+        <button class="mclose" onclick="closePay()">✕</button>
+      </div>
+      <div class="pay-body">
+        <div class="pay-summary">
+          <span>Total a pagar:</span>
+          <strong id="payTotal">R$ 0,00</strong>
+        </div>
+        <p class="pay-label">Escolha como pagar:</p>
+        <div class="pay-methods">
+          <div class="pay-opt" id="optDebito"  onclick="selectPay('debito')"><div class="plbl">Débito</div><div class="psub">Aprovação imediata</div></div>
+          <div class="pay-opt" id="optCredito" onclick="selectPay('credito')"><div class="plbl">Crédito</div><div class="psub">Até 12x sem juros</div></div>
+          <div class="pay-opt" id="optPix"     onclick="selectPay('pix')"><div class="plbl">PIX</div><div class="psub">Instantâneo</div></div>
+        </div>
+        <!-- PIX -->
+        <div class="pix-panel" id="pixPanel">
+          <p class="pix-instructions">Escaneie com o app do seu banco:</p>
+          <div id="qrcodeBox"></div>
+          <div class="pix-timer">Expira em: <span id="pixTimer">05:00</span></div>
+          <div class="pix-key" onclick="copyPix()">Clique para copiar a chave PIX:<br/><span id="pixKeyText">salgados-da-vovo@pix.com.br</span></div>
+          <div class="test-badge">Ambiente de teste — nenhum valor será cobrado</div>
+          <button class="btn-pay btn-pix" onclick="confirmPix()">Confirmar Pagamento PIX</button>
+        </div>
+        <!-- CARTÃO -->
+        <div class="card-panel" id="cardPanel">
+          <div class="test-badge">Modo teste — qualquer número válido funciona</div>
+          <div class="card-preview">
+            <span class="card-chip">💳</span>
+            <div class="card-num-disp" id="cNumDisp">•••• •••• •••• ••••</div>
+            <div class="card-bot">
+              <div><div class="clbl">TITULAR</div><div class="cval" id="cNameDisp">SEU NOME</div></div>
+              <div><div class="clbl">VALIDADE</div><div class="cval" id="cExpDisp">MM/AA</div></div>
+              <div class="card-flag" id="cFlag">💳</div>
+            </div>
+          </div>
+          <div class="cfinput"><label>Número do Cartão</label><input type="text" id="cardNum" placeholder="0000 0000 0000 0000" maxlength="19" oninput="fmtCard()" /></div>
+          <div class="cfinput"><label>Nome no Cartão</label><input type="text" id="cardName" placeholder="NOME COMO NO CARTÃO" oninput="fmtName()" /></div>
+          <div class="cf2">
+            <div class="cfinput"><label>Validade</label><input type="text" id="cardExp" placeholder="MM/AA" maxlength="5" oninput="fmtExp()" /></div>
+            <div class="cfinput"><label>CVV</label><input type="text" id="cardCvv" placeholder="•••" maxlength="3" oninput="this.value=this.value.replace(/\D/g,'')" /></div>
+          </div>
+          <p class="pay-type-lbl" id="payTypeLbl"></p>
+          <p class="err" id="cardErr" style="margin-bottom:8px">Preencha todos os campos corretamente.</p>
+          <button class="btn-pay" id="btnPayCard" onclick="confirmCard()">Confirmar Pagamento</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PEDIDO CONFIRMADO -->
+  <div class="overlay" id="successOverlay">
+    <div class="smodal">
+      
+      <h2>Pedido Confirmado!</h2>
+      <p>Seu pedido está sendo preparado com muito carinho!</p>
+      <div class="opill" id="orderNum">#0000</div>
+      <div class="pay-done" id="payDone"></div>
+      <p style="font-size:.8rem;color:var(--cinza);margin-bottom:20px">Acompanhe pelo e-mail cadastrado.</p>
+      <button class="btn-p" onclick="closeSuccess()">Fazer novo pedido</button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- BOTÃO WHATSAPP -->
+  <a class="whatsapp-btn" href="https://wa.me/551981206663" target="_blank" rel="noopener" title="Fale conosco no WhatsApp">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+  </a>
+  <div class="wa-tooltip">Fale conosco!</div>
+
+
+  <!-- ================================================================
+       JAVASCRIPT — LÓGICA
+  ================================================================ -->
+  <script src="script.js"></script>
+</body>
+</html>
+
+
+
